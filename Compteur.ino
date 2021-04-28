@@ -39,7 +39,8 @@ unsigned long interval_connexion = 600000L; // Temps avant d'essayer de se recon
 
 //Captor stuff
 float calibrationFactor = 4.5; // Ratio déterminant le débit (valeur fabriquant du capteur) -> Sensor Frequency (Hz) = 4.5 * Q (Liters/min)
-
+bool analog_captor = true // Mettre false si pas de capteur en analogique.
+ 
 //NTP stuff
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 7200, interval_ntp);
@@ -264,7 +265,8 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   }
   
   char data[64];
-  int length = snprintf(data, 64, "%s %f %f %llu\n", date, totalLitres, flowLitres, extendedMillis());
+  if (analog_captor) int length = snprintf(data, 64, "%s %f %f %llu %d\n", date, totalLitres, flowLitres, extendedMillis(), analogRead(analogInPin));
+  else int length = snprintf(data, 64, "%s %f %f %llu\n", date, totalLitres, flowLitres, extendedMillis());
   dclient.write(data, length);
 
   dclient.stop();
