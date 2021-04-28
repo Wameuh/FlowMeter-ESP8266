@@ -37,18 +37,18 @@ Programme prévu pour :
 Installation logiciel
 ----------------
 Le programme peut être uploadé en utilisant le logiciel Arduino IDE.
-1- Téléchargez et installez et lancez le programme : https://www.arduino.cc/en/software (avec les drivers notamment)
+1. Téléchargez et installez et lancez le programme : https://www.arduino.cc/en/software (avec les drivers notamment)
 
-2- Dans Fichier>Préférences ajouter dans "URL de gestionnaire de cartes supplémentaires" :
+2. Dans Fichier>Préférences ajouter dans "URL de gestionnaire de cartes supplémentaires" :
 	https://arduino.esp8266.com/stable/package_esp8266com_index.json
 	
-3- Dans Outils>Types de cartes>Gestionnaire de cartes :
+3. Dans Outils>Types de cartes>Gestionnaire de cartes :
 	- Indiquez ESP8266 dans la barre de recherche
 	- Sélectionnez la dernière version et installé le pack "esp8266 by ESP8266 Community" (programme réalisé sur la version 2.7.4)
 
-4- Sélectionnez Outils>Types de cartes>ESP8266 Boards>Generic ESP8266 Module
+4. Sélectionnez Outils>Types de cartes>ESP8266 Boards>Generic ESP8266 Module
 
-5- Cliquez sur Outils>Gérer les bibliothèques :
+5. Cliquez sur Outils>Gérer les bibliothèques :
 	- Indiquez SSD1306 dans la barre de recherche
 	- Installez la dernière version de la librairie Adafruit SSD1306
 	- Indiquez GFX dans la barre de recherche
@@ -56,17 +56,17 @@ Le programme peut être uploadé en utilisant le logiciel Arduino IDE.
 	- Indiquez Bus dans la barre de recherche
 	- Installez la dernière version de la librairie Adafruit BusIO
 
-6- Téléchargez la librairie Taranais NTPClient sur https://github.com/taranais/NTPClient
+6. Téléchargez la librairie Taranais NTPClient sur https://github.com/taranais/NTPClient
 	- Cliquez sur Code>Download ZIP
 	- Renommez le fichier pour qu'il n'y ait pas de caractères spéciaux dans le nom
 
-7- Revenez sur Arduino IDE, cliquez sur Croquis>Inclure une bibliothèque>Ajouter la bibliothèque .ZIP...
+7. Revenez sur Arduino IDE, cliquez sur Croquis>Inclure une bibliothèque>Ajouter la bibliothèque .ZIP...
 	- choisissez votre fichier .ZIP téléchargé au 6-
 
-8- Cliquez sur Fichier>Exemples>01.Basics>BareMinimum
-9- Copiez/collez le code dans la fenêtre qui est apparue
-10- Sélectionnez le port dans Outils>Port> (ça peut être COM1 par exemple)
-11- Configurez le programme :
+8. Cliquez sur Fichier>Exemples>01.Basics>BareMinimum
+9. Copiez/collez le code dans la fenêtre qui est apparue
+10. Sélectionnez le port dans Outils>Port> (ça peut être COM1 par exemple)
+11. Configurez le programme :
 	- WIFI stuff
 	- FTP stuff
 	- File stuff
@@ -74,9 +74,9 @@ Le programme peut être uploadé en utilisant le logiciel Arduino IDE.
 	- Captor stuff
 	- NTP stuff (vous pouvez modifier le serveur NTP et le nombre qui suit pour mettre un décalage entre l'heure UTC et l'heure désirée)
 
-12- Cliquez sur Croquis>Vérifier/Compiler
+12. Cliquez sur Croquis>Vérifier/Compiler
 
-13- S'il n'y a pas d'erreur cliquez sur Croquis>Téléverser
+13. S'il n'y a pas d'erreur cliquez sur Croquis>Téléverser
 
 Et voilà le programme est dans l'ESP8266.
 ------------------------------------------------------------------------------------
@@ -93,6 +93,7 @@ Toutes les secondes(interval_affichage), il regarde le nombre d'impulsion, met �
 Toutes les minutes(interval_upload), si la dernière connexion FTP a marché et s'il y a eu du débit depuis le dernier upload envoi
 en FTP l'horodatage le volume total le débit de la dernière seconde (en L/m) et le nombre de milisecondes depuis le dernier démarrage
 en l'ajoutant sur une ligne dans un fichier YYYYMMDDHHMMSS VVVVVV DDDDD SSSSSS
+
 exemple : 
 
 20210428110408 3.881304 0.347800 73030
@@ -114,8 +115,11 @@ Toutes les heures, s'il n'y a pas eu d'upload et que le FTP marche, il va forcer
 Précisions
 ----------
 La fonction extendedMillis() permet d'éviter un rollover de millis() au bout de 50j.
+
 Au rédemarrage de l'ESP le volume total est perdu, ceci peut être vu par le nombre de milisecondes dans le fichier FTP.
+
 La gestion des erreur FTP est très limitée (car ma compréhension du code utilisé reste limitée)
+
 Le programme risque de bugger s'il n'y a pas eu de redémarrage avant un total de 428m3 d'eau.
 
 
