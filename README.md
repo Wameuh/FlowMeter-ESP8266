@@ -90,7 +90,7 @@ Au lancement, il se connecte en Wifi,essaie la connexion FTP et commence le serv
 
 Toutes les secondes(interval_affichage), il regarde le nombre d'impulsion, met à jour le compteur et l'affichage.
 
-Toutes les minutes(interval_upload), si la dernière connexion FTP a marché et s'il y a eu du débit depuis le dernier upload envoi en FTP l'horodatage le volume total le débit de la dernière seconde (en L/m) et le nombre de milisecondes depuis le dernier démarrage en l'ajoutant sur une ligne dans un fichier YYYYMMDDHHMMSS VVVVVV DDDDD SSSSSS.
+Toutes les minutes(interval_upload), si la dernière connexion FTP a marché et s'il y a eu du débit depuis le dernier upload envoi en FTP l'horodatage le volume total le débit de la dernière seconde (en L/m) et le nombre de milisecondes depuis le dernier démarrage (+valeur de l'entrée analogique si le booléen est vrai dans les paramétrages) en l'ajoutant sur une ligne dans un fichier YYYYMMDDHHMMSS VVVVVV DDDDD SSSSSS.
 
 Exemple : 
 
