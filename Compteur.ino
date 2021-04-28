@@ -38,7 +38,7 @@ unsigned long interval_ntp = 3600000L; // Temps entre deux synchronosation avec 
 unsigned long interval_connexion = 600000L; // Temps avant d'essayer de se reconnecter en ms
 
 //Captor stuff
-float calibrationFactor = 4.5; // Ratio déterminant le débit (valeur fabriquant du capteur) -> Sensor Frequency (Hz) = 4.5 * Q (Liters/min)
+// Basé sur capteur débit : F = 6*Q-8
 bool analog_captor = true // Mettre false si pas de capteur en analogique.
  
 //NTP stuff
@@ -427,34 +427,29 @@ void lancementWifi(void) //Fonction de connexion au WIFI
 
 void calcul_debit() //Fonction de calcul du débit 
 {
-  // récupération du nombre de pulsation
-  pulse1Sec = pulseCount;
-  pulseCount -= pulse1Sec;
+  pulse1Sec = pulseCount; // récupération du nombre de pulsation
 
-  //transcription en débit
-
-  // Because this loop may not complete in exactly 1 second intervals we calculate
-  // the number of milliseconds that have passed since the last execution and use
-  // that to scale the output. We also apply the calibrationFactor to scale the output
-  // based on the number of pulses per second per units of measure (litres/minute in
-  // this case) coming from the sensor.
-  flowRate = ((1000.0 / (extendedMillis() - previousMillis)) * pulse1Sec) / calibrationFactor;
+  float t = (extendedMillis() - previousMillis)/1000.;
   previousMillis = extendedMillis();
+  if (puse1Sec == 0)
+  {
+    flowRate = 0; //débit nul
+    flowMilliLitres = 0;
+    flowLitres = 0;
+  }
+  else
+  {
+    pulseCount -= pulse1Sec;
+    flowRate = (pulse1Sec/t+8.0)/6; // Calcul du débit
+    flowMilliLitres = (pulse1Sec+8*t)*1000/6; //Volume en mL depuis dernier comptage
+    flowLitres = (pulse1Sec+8.0*t)/6; //Volume en L depuis dernier comptage
+  }
   
-  //transcription en volume
+  totalMilliLitres += flowMilliLitres; //Volume total en mL depuis dernier boot
+  totalLitres = totalMilliLitres/1000.; //Volume total en L depuis dernier boot
+  Millitres_since_last_upload += flowLitres; //Permet de voir si ça vaut le coup d'uploader
 
-  // Divide the flow rate in litres/minute by 60 to determine how many litres have
-  // passed through the sensor in this 1 second interval, then multiply by 1000 to
-  // convert to millilitres.
-  flowMilliLitres = (flowRate / 60) * 1000;
-  flowLitres = (flowRate / 60);
-  
-  //Ajout au total
 
-  // Add the millilitres passed in this second to the cumulative total 
-  totalMilliLitres += flowMilliLitres;
-  totalLitres = totalMilliLitres/1000.;
-  Millitres_since_last_upload += flowLitres;
   if (debug) Serial.println("fin calcul débit");
   return;
 }
