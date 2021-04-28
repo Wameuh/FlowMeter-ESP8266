@@ -1,6 +1,6 @@
 Capteur de débit d'eau avec upload de l'information sur server FTP par un ESP8266
 ----------------------------------------------------------------------------------
-
+Mesure le débit et envoi la données en ajoutant une ligne sur un fichier par FTP.
 
 Inspirations
 ------------
@@ -8,6 +8,7 @@ Partie gestion capteur réalisée sur inspiration de :
 https://how2electronics.com/iot-water-flow-meter-using-esp8266-water-flow-sensor/#IoT_Water_Flow_Meter_using_ESP8266_Water_Flow_Sensor
 Partie FTP réalisée sur inspiration de :
 https://www.rudiswiki.de/wiki9/WiFiFTPServer
+
 ----------------------------------------------------------------------------------
 
 
@@ -36,12 +37,16 @@ Installation logiciel
 ----------------
 Le programme peut être uploadé en utilisant le logiciel Arduino IDE.
 1- Téléchargez et installez et lancez le programme : https://www.arduino.cc/en/software (avec les drivers notamment)
+
 2- Dans Fichier>Préférences ajouter dans "URL de gestionnaire de cartes supplémentaires" :
 	https://arduino.esp8266.com/stable/package_esp8266com_index.json
+	
 3- Dans Outils>Types de cartes>Gestionnaire de cartes :
 	- Indiquez ESP8266 dans la barre de recherche
 	- Sélectionnez la dernière version et installé le pack "esp8266 by ESP8266 Community" (programme réalisé sur la version 2.7.4)
+
 4- Sélectionnez Outils>Types de cartes>ESP8266 Boards>Generic ESP8266 Module
+
 5- Cliquez sur Outils>Gérer les bibliothèques :
 	- Indiquez SSD1306 dans la barre de recherche
 	- Installez la dernière version de la librairie Adafruit SSD1306
@@ -49,11 +54,14 @@ Le programme peut être uploadé en utilisant le logiciel Arduino IDE.
 	- Installez la dernière version de la librairie Adafruit GFX Library
 	- Indiquez Bus dans la barre de recherche
 	- Installez la dernière version de la librairie Adafruit BusIO
+
 6- Téléchargez la librairie Taranais NTPClient sur https://github.com/taranais/NTPClient
 	- Cliquez sur Code>Download ZIP
 	- Renommez le fichier pour qu'il n'y ait pas de caractères spéciaux dans le nom
+
 7- Revenez sur Arduino IDE, cliquez sur Croquis>Inclure une bibliothèque>Ajouter la bibliothèque .ZIP...
 	- choisissez votre fichier .ZIP téléchargé au 6-
+
 8- Cliquez sur Fichier>Exemples>01.Basics>BareMinimum
 9- Copiez/collez le code dans la fenêtre qui est apparue
 10- Sélectionnez le port dans Outils>Port> (ça peut être COM1 par exemple)
@@ -64,7 +72,9 @@ Le programme peut être uploadé en utilisant le logiciel Arduino IDE.
 	- Delay stuff
 	- Captor stuff
 	- NTP stuff (vous pouvez modifier le serveur NTP et le nombre qui suit pour mettre un décalage entre l'heure UTC et l'heure désirée)
+
 12- Cliquez sur Croquis>Vérifier/Compiler
+
 13- S'il n'y a pas d'erreur cliquez sur Croquis>Téléverser
 
 Et voilà le programme est dans l'ESP8266.
