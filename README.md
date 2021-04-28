@@ -6,6 +6,7 @@ Inspirations
 ------------
 Partie gestion capteur réalisée sur inspiration de :
 https://how2electronics.com/iot-water-flow-meter-using-esp8266-water-flow-sensor/#IoT_Water_Flow_Meter_using_ESP8266_Water_Flow_Sensor
+
 Partie FTP réalisée sur inspiration de :
 https://www.rudiswiki.de/wiki9/WiFiFTPServer
 
@@ -93,9 +94,13 @@ Toutes les minutes(interval_upload), si la dernière connexion FTP a marché et 
 en FTP l'horodatage le volume total le débit de la dernière seconde (en L/m) et le nombre de milisecondes depuis le dernier démarrage
 en l'ajoutant sur une ligne dans un fichier YYYYMMDDHHMMSS VVVVVV DDDDD SSSSSS
 exemple : 
+
 20210428110408 3.881304 0.347800 73030
+
 20210428110429 7.377808 0.284900 94063
+
 20210428110453 7.640508 0.007400 118088
+
 20210428110524 12.232213 0.000000 149176
 
 Toutes les 10 minutes(interval_connexion), il vérifie qu'il y a toujours le WIFI sinon essaie de se reconnecter. S'il il y a eu un echec au niveau
