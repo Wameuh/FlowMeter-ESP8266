@@ -92,7 +92,7 @@ Toutes les secondes(interval_affichage), il regarde le nombre d'impulsion, met �
 
 Toutes les minutes(interval_upload), si la dernière connexion FTP a marché et s'il y a eu du débit depuis le dernier upload envoi en FTP l'horodatage le volume total le débit de la dernière seconde (en L/m) et le nombre de milisecondes depuis le dernier démarrage en l'ajoutant sur une ligne dans un fichier YYYYMMDDHHMMSS VVVVVV DDDDD SSSSSS.
 
-Zxemple : 
+Exemple : 
 
 20210428110408 3.881304 0.347800 73030
 
