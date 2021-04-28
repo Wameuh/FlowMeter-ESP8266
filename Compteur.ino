@@ -32,10 +32,10 @@ char dirName[] = "test"; //nom du répertoire sur le FTP à créer ou aller
 
 //Delay stuff
 unsigned long interval_affichage = 1000L; // Temps entre chaque raffraichissement du calcul et de l'affichage en ms MODIFIER CETTE VALEUR CHANGERA LE CALCUL DU DEBIT
-unsigned long interval_upload = 20000L; // Temps entre chaque upload sur le FTP (en cas de débit > 0) en ms
-unsigned long interval_sansdebit = 30000L; // Temps entre chaque upload sur le FTP (en cas de débit nul) en ms
+unsigned long interval_upload = 60000L; // Temps entre chaque upload sur le FTP (en cas de débit > 0) en ms
+unsigned long interval_sansdebit = 3600000L; // Temps entre chaque upload sur le FTP (en cas de débit nul) en ms
 unsigned long interval_ntp = 3600000L; // Temps entre deux synchronosation avec le serveur NTP pour l'horodatage en ms (entre deux synchronisation il utilise millis())
-unsigned long interval_connexion = 40000L; // Temps avant d'essayer de se reconnecter en ms
+unsigned long interval_connexion = 600000L; // Temps avant d'essayer de se reconnecter en ms
 
 //Captor stuff
 float calibrationFactor = 4.5; // Ratio déterminant le débit (valeur fabriquant du capteur) -> Sensor Frequency (Hz) = 4.5 * Q (Liters/min)
