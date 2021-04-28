@@ -117,7 +117,6 @@ Au rédemarrage de l'ESP le volume total est perdu, ceci peut être vu par le no
 
 La gestion des erreur FTP est très limitée (car ma compréhension du code utilisé reste limitée)
 
-Le programme risque de bugger s'il n'y a pas eu de redémarrage avant un total de 428m3 d'eau.
 
 
 ------------------------------------------------------------------------------------
