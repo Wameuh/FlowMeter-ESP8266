@@ -29,8 +29,8 @@ Programme prévu pour :
 - ESP8266 avec écran 1.3pouces OLED. A la base il est avec Micronpython mais non utilisé ici. (alimentation 5V)
 	https://www.makerfabs.com/makepython-esp8266.html
 - Capteur de débit d'eau à effet hall.
-	https://www.gotronic.fr/art-capteur-de-debit-yf-b2-31350.htm.
-	Son alimentation est branchée en parallèle de celle de l'ESP (sur VCCin et GND). La sortie est connectée au GPIO12.
+	http://www.sunwoald.com/en/productshow.asp?ArticleID=R8S7WRQTY5
+	Son alimentation est branchée en parallèle de celle de l'ESP (sur VCCin et GND). La sortie est connectée au GPIO12. (Vérifier que le capteur marche en collecteur ouvert)
 ------------------------------------------------------------------------------------
 
 
@@ -84,8 +84,6 @@ Et voilà le programme est dans l'ESP8266.
 
 Fonctionnement du programme
 ---------------------------
-Chaque pulsation du capteur va interrompre le programme pour incrémenter le compteur (Volume(L) = Nbr pulsation / (coefficient*60)).
-
 Au lancement, il se connecte en Wifi,essaie la connexion FTP et commence le service NTP.
 
 Toutes les secondes(interval_affichage), il regarde le nombre d'impulsion, met à jour le compteur et l'affichage.
@@ -113,7 +111,7 @@ Précisions
 ----------
 La fonction extendedMillis() permet d'éviter un rollover de millis() au bout de 50j.
 
-Au rédemarrage de l'ESP le volume total est perdu, ceci peut être vu par le nombre de milisecondes dans le fichier FTP.
+Au rédemarrage de l'ESP le volume total est perdu en local, ceci peut être vu par le nombre de milisecondes dans le fichier FTP.
 
 La gestion des erreur FTP est très limitée (car ma compréhension du code utilisé reste limitée)
 
