@@ -39,7 +39,7 @@ unsigned long interval_connexion = 600000L; // Temps avant d'essayer de se recon
 
 //Captor stuff
 // Basé sur capteur débit : F = 6*Q-8
-bool analog_captor = true // Mettre false si pas de capteur en analogique.
+bool analog_captor = true; // Mettre false si pas de capteur en analogique.
  
 //NTP stuff
 WiFiUDP ntpUDP;
