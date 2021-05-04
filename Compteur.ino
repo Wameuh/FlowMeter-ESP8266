@@ -40,6 +40,7 @@ unsigned long interval_connexion = 600000L; // Temps avant d'essayer de se recon
 //Captor stuff
 // Basé sur capteur débit : F = 6*Q-8
 bool analog_captor = true; // Mettre false si pas de capteur en analogique.
+const int analogInPin = A0; // ESP8266 Analog Pin ADC0 = A0
  
 //NTP stuff
 WiFiUDP ntpUDP;
@@ -265,6 +266,7 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   }
   
   char data[64];
+  int length = 0;
   if (analog_captor) int length = snprintf(data, 64, "%s %f %f %llu %d\n", date, totalLitres, flowLitres, extendedMillis(), analogRead(analogInPin));
   else int length = snprintf(data, 64, "%s %f %f %llu\n", date, totalLitres, flowLitres, extendedMillis());
   dclient.write(data, length);
@@ -431,7 +433,7 @@ void calcul_debit() //Fonction de calcul du débit
 
   float t = (extendedMillis() - previousMillis)/1000.;
   previousMillis = extendedMillis();
-  if (puse1Sec == 0)
+  if (pulse1Sec == 0)
   {
     flowRate = 0; //débit nul
     flowMilliLitres = 0;
@@ -591,6 +593,3 @@ void loop()
   }
   
 }
-
-
-
