@@ -33,7 +33,7 @@ char dirName[] = "test"; //nom du répertoire sur le FTP à créer ou aller
 //Delay stuff
 unsigned long interval_affichage = 1000L; // Temps entre chaque raffraichissement du calcul et de l'affichage en ms MODIFIER CETTE VALEUR CHANGERA LE CALCUL DU DEBIT
 unsigned long interval_upload = 60000L; // Temps entre chaque upload sur le FTP (en cas de débit > 0) en ms
-unsigned long interval_sansdebit = 3600000L; // Temps entre chaque upload sur le FTP (en cas de débit nul) en ms
+unsigned long interval_sansdebit = 90000L; // Temps entre chaque upload sur le FTP (en cas de débit nul) en ms
 unsigned long interval_ntp = 3600000L; // Temps entre deux synchronosation avec le serveur NTP pour l'horodatage en ms (entre deux synchronisation il utilise millis())
 unsigned long interval_connexion = 600000L; // Temps avant d'essayer de se reconnecter en ms
 
@@ -267,8 +267,11 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   
   char data[64];
   int length = 0;
-  if (analog_captor) int length = snprintf(data, 64, "%s %f %f %llu %d\n", date, totalLitres, flowLitres, extendedMillis(), analogRead(analogInPin));
-  else int length = snprintf(data, 64, "%s %f %f %llu\n", date, totalLitres, flowLitres, extendedMillis());
+  if (analog_captor) length = snprintf(data, 64, "%s %f %f %llu %d\n", date, totalLitres, flowLitres, extendedMillis(), analogRead(analogInPin));
+  else length = snprintf(data, 64, "%s %f %f %llu\n", date, totalLitres, flowLitres, extendedMillis());
+  Serial.print(F("Ecriture d'une ligne sur le fichier FTP, longueur : "));
+  Serial.println(length);
+  Serial.println(data);
   dclient.write(data, length);
 
   dclient.stop();
@@ -466,7 +469,6 @@ void affichage_debit(void) //Fonction de mise à jour de l'affichage
     Serial.print("L/min");
     Serial.print("\t");       // Print tab space
  
-    Serial.print("debug");
     
     display.setCursor(10,0);  //oled display
     display.setTextSize(1);
