@@ -60,7 +60,7 @@ unsigned long flowMilliLitres;
 uint64_t totalMilliLitres;
 float flowLitres;
 float totalLitres;
-uint64_t Millitres_since_last_upload =0;
+uint64_t Millilitres_since_last_upload =0;
 bool FTP=false;
 void IRAM_ATTR pulseCounter()
 {
@@ -480,7 +480,7 @@ void calcul_debit() //Fonction de calcul du débit
   
   totalMilliLitres += flowMilliLitres; //Volume total en mL depuis dernier boot
   totalLitres = totalMilliLitres/1000.; //Volume total en L depuis dernier boot
-  Millitres_since_last_upload += flowLitres; //Permet de voir si ça vaut le coup d'uploader
+  Millilitres_since_last_upload += flowLitres; //Permet de voir si ça vaut le coup d'uploader
 
 
   if (debug) Serial.println("fin calcul débit");
@@ -586,7 +586,7 @@ void loop()
   {
     calcul_debit();
     affichage_debit();
-    if (extendedMillis() - previous_upload > interval_upload && Millitres_since_last_upload > 0 && FTP) // test si il y a eu du débit sinon ça ne sert à rien d'uploader.
+    if (extendedMillis() - previous_upload > interval_upload && Millilitres_since_last_upload > 0 && FTP) // test si il y a eu du débit sinon ça ne sert à rien d'uploader.
     {
       if (debug_conditions) Serial.println("FTP ok - Débit ok - upload");
       
@@ -594,7 +594,7 @@ void loop()
       if (FTP) 
       {
         previous_upload = extendedMillis();
-        Millitres_since_last_upload = 0;
+        Milliliitres_since_last_upload = 0;
       }
     }
     if (extendedMillis() - previous_connexion > interval_connexion ) //toutes les 10 minutes on regarde si il y a toujours le WIFI sinon on se reconnecte
@@ -608,7 +608,7 @@ void loop()
         if (FTP) 
         {
           previous_upload = extendedMillis();
-          Millitres_since_last_upload = 0;
+          Millilitres_since_last_upload = 0;
         }
       }
       previous_connexion = extendedMillis();
@@ -617,7 +617,11 @@ void loop()
     {
       if (debug_conditions) Serial.println("FTP ok - Débit 0 - upload");
       FTP=uploadFTP();
-      if (FTP) previous_upload = extendedMillis();
+      if (FTP) 
+      {
+        previous_upload = extendedMillis();
+        Millilitres_since_last_upload = 0;
+      }
     }
     if (debug) Serial.println("fin d'une boucle");
   }
