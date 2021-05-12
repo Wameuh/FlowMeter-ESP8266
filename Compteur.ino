@@ -242,7 +242,31 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   
   client.print("CWD ");
   client.println(dirName);
-  client.print("APPE ");
+  if(!eRcv())
+  {
+    dclient.stop();
+    return false;
+  }
+  client.print("SIZE ");
+  client.println(fileName);
+  byte byte_taille_fichier;
+  char taille_fichier[64];
+  int l_taille_fichier = 0;
+  while(!client.available()) delay(1);
+  while(client.available())
+  { 
+    byte_taille_fichier = client.read();   
+    Serial.write(byte_taille_fichier);
+    l_taille_fichier+=snprintf(taille_fichier + l_taille_fichier,64 - l_taille_fichier,"%c",byte_taille_fichier);
+  }
+  l_taille_fichier += snprintf(taille_fichier + l_taille_fichier, 64 - l_taille_fichier, "\n");
+  char commandeFTP[64], offset[64];
+  sscanf(taille_fichier, "%s %s", commandeFTP, offset);
+  Serial.print(F("Ecriture a l'emplacement : "));
+  Serial.println(offset);
+  client.print("REST ");
+  client.println(offset);
+  client.print("STOR ");
   client.println(fileName);
   if(!eRcv())
   {
@@ -273,7 +297,6 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   Serial.println(length);
   Serial.println(data);
   dclient.write(data, length);
-
   dclient.stop();
   Serial.println(F("Data disconnected"));
   display.clearDisplay();
@@ -282,6 +305,11 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   if (debug) Serial.println("debug 5");
   client.println();
   if(!eRcv()) return false;
+  
+  client.print("SIZE ");
+  client.println(fileName);
+  Serial.println(F("Nouvelle taille du fichier :"));
+  if(!eRcv()) return false; 
 
   client.println("QUIT");
 
