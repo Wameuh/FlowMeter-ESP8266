@@ -474,8 +474,8 @@ void calcul_debit() //Fonction de calcul du débit
   {
     pulseCount -= pulse1Sec;
     flowRate = (pulse1Sec/t+8.0)/6; // Calcul du débit
-    flowMilliLitres = (pulse1Sec+8*t)*1000/6; //Volume en mL depuis dernier comptage
-    flowLitres = (pulse1Sec+8.0*t)/6; //Volume en L depuis dernier comptage
+    flowMilliLitres = (pulse1Sec+8*t)*1000/360; //Volume en mL depuis dernier comptage
+    flowLitres = (pulse1Sec+8.0*t)/360; //Volume en L depuis dernier comptage
   }
   
   totalMilliLitres += flowMilliLitres; //Volume total en mL depuis dernier boot
