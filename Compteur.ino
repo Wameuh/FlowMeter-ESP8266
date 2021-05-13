@@ -262,10 +262,14 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   l_taille_fichier += snprintf(taille_fichier + l_taille_fichier, 64 - l_taille_fichier, "\n");
   char commandeFTP[64], offset[64];
   sscanf(taille_fichier, "%s %s", commandeFTP, offset);
-  Serial.print(F("Ecriture a l'emplacement : "));
-  Serial.println(offset);
-  client.print("REST ");
-  client.println(offset);
+  if (commandeFTP=="213")
+  {
+      Serial.print(F("Ecriture a l'emplacement : "));
+      Serial.println(offset);
+      client.print("REST ");
+      client.println(offset);
+  }
+  else Serial.println(F("Pas de fichier, creation de celui-ci"));
   client.print("STOR ");
   client.println(fileName);
   if(!eRcv())
