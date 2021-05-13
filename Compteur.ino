@@ -594,7 +594,7 @@ void loop()
       if (FTP) 
       {
         previous_upload = extendedMillis();
-        Milliliitres_since_last_upload = 0;
+        Millilitres_since_last_upload = 0;
       }
     }
     if (extendedMillis() - previous_connexion > interval_connexion ) //toutes les 10 minutes on regarde si il y a toujours le WIFI sinon on se reconnecte
