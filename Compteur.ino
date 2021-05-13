@@ -3,12 +3,15 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <ESP8266WiFi.h>
-#include <NTPClient.h> //Il ne s'agit pas du NTPClien de base mais du Taranais NTP Client https://github.com/taranais/NTPClient
+#include <NTPClient.h> //Il ne s'agit pas du NTPClient de base mais du Taranais NTP Client https://github.com/taranais/NTPClient
 #include <WiFiUdp.h>
+#include "configuration.h"
  
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
 #define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SENSOR  12
+#define REAL_LED_PIN 16
  
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
@@ -16,38 +19,34 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 bool  debug = false;
 bool debug_conditions = false;
 
-//WIFI stuff
-const char *ssid = "SSID";  
-const char *pass = "WIFIPWD";
-
-//FTP stuff
-const char* host = "FTPIP";
-const int port = 21;
-const char* userName = "FTPUser";
-const char* password = "FTPPwd";
-//File stuff
-char fileName[] = "data.csv"; //nom du fichier à modifier
-char dirName[] = "test"; //nom du répertoire sur le FTP à créer ou aller 
+//Récupération des informations de configuration (fichier configuration.h)
+const char *ssid = SSID;  
+const char *pass = WIFI_PASS;
+const char* host = HOST;
+const int port = PORT;
+const char* userName = USERNAME;
+const char* password = FTP_PASSWORD;
+char fileName[] = FILENAME;
+char dirName[] = DIRNAME; 
 
 
 //Delay stuff
 unsigned long interval_affichage = 1000L; // Temps entre chaque raffraichissement du calcul et de l'affichage en ms MODIFIER CETTE VALEUR CHANGERA LE CALCUL DU DEBIT
-unsigned long interval_upload = 60000L; // Temps entre chaque upload sur le FTP (en cas de débit > 0) en ms
-unsigned long interval_sansdebit = 90000L; // Temps entre chaque upload sur le FTP (en cas de débit nul) en ms
+unsigned long interval_upload = 6000L; // Temps entre chaque upload sur le FTP (en cas de débit > 0) en ms
+unsigned long interval_sansdebit = 9000L; // Temps entre chaque upload sur le FTP (en cas de débit nul) en ms
 unsigned long interval_ntp = 3600000L; // Temps entre deux synchronosation avec le serveur NTP pour l'horodatage en ms (entre deux synchronisation il utilise millis())
 unsigned long interval_connexion = 600000L; // Temps avant d'essayer de se reconnecter en ms
 
 //Captor stuff
 // Basé sur capteur débit : F = 6*Q-8
-bool analog_captor = true; // Mettre false si pas de capteur en analogique.
+bool analog_captor = false; // Mettre false si pas de capteur en analogique.
 const int analogInPin = A0; // ESP8266 Analog Pin ADC0 = A0
+bool calibration = true; // True = donne le nombre de pulsation
  
 //NTP stuff
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 7200, interval_ntp);
 
-#define LED_BUILTIN 16
-#define SENSOR  12
  
 uint64_t previousMillis = 0;
 uint64_t previous_connexion = 0;
@@ -58,6 +57,7 @@ byte pulse1Sec = 0;
 float flowRate;
 unsigned long flowMilliLitres;
 uint64_t totalMilliLitres;
+uint64_t pulseCount_calibration = 0;
 float flowLitres;
 float totalLitres;
 uint64_t Millilitres_since_last_upload =0;
@@ -72,7 +72,7 @@ void IRAM_ATTR pulseCounter()
 //############################################
 //DO NOT CHANGE THESE
 char outBuf[128];
-char outCount;
+int outCount;
 WiFiClient client; //client pour se connecter
 WiFiClient dclient; //client pour transférer les données
 
@@ -260,14 +260,14 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
     l_taille_fichier+=snprintf(taille_fichier + l_taille_fichier,64 - l_taille_fichier,"%c",byte_taille_fichier);
   }
   l_taille_fichier += snprintf(taille_fichier + l_taille_fichier, 64 - l_taille_fichier, "\n");
-  char commandeFTP[64], offset[64];
-  sscanf(taille_fichier, "%s %s", commandeFTP, offset);
-  if (commandeFTP=="213")
+  char * retour_FTP = strtok(taille_fichier, " ");
+  if (atoi(retour_FTP) != 550)
   {
+      retour_FTP = strtok(NULL, " ");
       Serial.print(F("Ecriture a l'emplacement : "));
-      Serial.println(offset);
+      Serial.println(retour_FTP);
       client.print("REST ");
-      client.println(offset);
+      client.println(retour_FTP);
   }
   else Serial.println(F("Pas de fichier, creation de celui-ci"));
   client.print("STOR ");
@@ -295,8 +295,16 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   
   char data[64];
   int length = 0;
-  if (analog_captor) length = snprintf(data, 64, "%s %f %f %llu %d\n", date, totalLitres, flowLitres, extendedMillis(), analogRead(analogInPin));
-  else length = snprintf(data, 64, "%s %f %f %llu\n", date, totalLitres, flowLitres, extendedMillis());
+  if (analog_captor) 
+  {
+    if (calibration) length = snprintf(data, 64, "%s %f %f %llu %d %llu\n", date, totalLitres, flowLitres, extendedMillis(), analogRead(analogInPin), pulseCount_calibration);
+    else length = snprintf(data, 64, "%s %f %f %llu %d\n", date, totalLitres, flowLitres, extendedMillis(), analogRead(analogInPin));
+  }
+  else
+  {
+    if (calibration) length = snprintf(data, 64, "%s %f %f %llu %llu\n", date, totalLitres, flowLitres, extendedMillis(), pulseCount_calibration);
+    else length = snprintf(data, 64, "%s %f %f %llu\n", date, totalLitres, flowLitres, extendedMillis());
+  }
   Serial.print(F("Ecriture d'une ligne sur le fichier FTP, longueur : "));
   Serial.println(length);
   Serial.println(data);
@@ -377,7 +385,6 @@ void connexionFTP(void) //Fonction de connexion au FTP sans upload (mais créati
   
   
   char *tStr = strtok(outBuf,"(,");
-  int array_pasv[6];
 
   if (debug) Serial.println("l260");
   for ( int i = 0; i < 6; i++) {
@@ -389,7 +396,6 @@ void connexionFTP(void) //Fonction de connexion au FTP sans upload (mais créati
       return;
     }
     if (debug) Serial.println(i+100);
-    array_pasv[i] = atoi(tStr);
     if (debug) Serial.println(i+200);
   }
   client.println("MLSD");
@@ -465,7 +471,7 @@ void lancementWifi(void) //Fonction de connexion au WIFI
 void calcul_debit() //Fonction de calcul du débit 
 {
   pulse1Sec = pulseCount; // récupération du nombre de pulsation
-
+  if (calibration) pulseCount_calibration += pulse1Sec;
   float t = (extendedMillis() - previousMillis)/1000.;
   previousMillis = extendedMillis();
   if (pulse1Sec == 0)
@@ -561,7 +567,7 @@ void setup()
   connexionFTP();
   
 
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(REAL_LED_PIN, OUTPUT);
   pinMode(SENSOR, INPUT_PULLUP);
  
   pulseCount = 0;
@@ -570,8 +576,6 @@ void setup()
   totalMilliLitres = 0;
   previousMillis = 0;
  
-    //SPIFF setup (permet la gestion des fichiers)
-  SPIFFS.begin();
 
   // Démarrage du client NTP - Start NTP client
   timeClient.begin();
@@ -599,6 +603,7 @@ void loop()
       {
         previous_upload = extendedMillis();
         Millilitres_since_last_upload = 0;
+        pulseCount_calibration = 0;
       }
     }
     if (extendedMillis() - previous_connexion > interval_connexion ) //toutes les 10 minutes on regarde si il y a toujours le WIFI sinon on se reconnecte
@@ -613,6 +618,7 @@ void loop()
         {
           previous_upload = extendedMillis();
           Millilitres_since_last_upload = 0;
+          pulseCount_calibration = 0;
         }
       }
       previous_connexion = extendedMillis();
@@ -625,6 +631,7 @@ void loop()
       {
         previous_upload = extendedMillis();
         Millilitres_since_last_upload = 0;
+        pulseCount_calibration = 0;
       }
     }
     if (debug) Serial.println("fin d'une boucle");
