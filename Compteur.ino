@@ -492,7 +492,7 @@ void calcul_debit() //Fonction de calcul du débit
   
   totalMilliLitres += flowMilliLitres; //Volume total en mL depuis dernier boot
   totalLitres = totalMilliLitres/1000.; //Volume total en L depuis dernier boot
-  Millilitres_since_last_upload += flowLitres; //Permet de voir si ça vaut le coup d'uploader
+  Millilitres_since_last_upload += flowMilliLitres; //Permet de voir si ça vaut le coup d'uploader
 
 
   if (debug) Serial.println("fin calcul débit");
