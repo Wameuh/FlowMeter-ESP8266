@@ -21,8 +21,8 @@ bool debug_conditions = false;
 bool debug_FTP = false;
 
 //Récupération des informations de configuration (fichier configuration.h)
-const char *ssid = "freebox_RNQYQC";  
-const char *pass = "j|No^p9Ueov)KSPfs&WlF6m+~uK2.9Pb@EHfs8fgE,=.Y=a)L~!)y=SpdApjOtA";
+const char *ssid = WIFI_SSID;  
+const char *pass = WIFI_PASS;
 const char* host = FTP_HOST;
 const int port = FTP_PORT;
 const char* userName = FTP_USERNAME;
