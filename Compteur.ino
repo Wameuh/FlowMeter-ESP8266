@@ -18,16 +18,17 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 //Debug stuff
 bool  debug = false;
 bool debug_conditions = false;
+bool debug_FTP = false;
 
 //Récupération des informations de configuration (fichier configuration.h)
-const char *ssid = SSID;  
-const char *pass = WIFI_PASS;
-const char* host = HOST;
-const int port = PORT;
-const char* userName = USERNAME;
+const char *ssid = "freebox_RNQYQC";  
+const char *pass = "j|No^p9Ueov)KSPfs&WlF6m+~uK2.9Pb@EHfs8fgE,=.Y=a)L~!)y=SpdApjOtA";
+const char* host = FTP_HOST;
+const int port = FTP_PORT;
+const char* userName = FTP_USERNAME;
 const char* password = FTP_PASSWORD;
-char fileName[] = FILENAME;
-char dirName[] = DIRNAME; 
+char fileName[] = FTP_FILENAME;
+char dirName[] = FTP_DIRNAME; 
 
 
 //Delay stuff
@@ -317,12 +318,13 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   if (debug) Serial.println("debug 5");
   client.println();
   if(!eRcv()) return false;
-  
-  client.print("SIZE ");
-  client.println(fileName);
-  Serial.println(F("Nouvelle taille du fichier :"));
-  if(!eRcv()) return false; 
-
+  if (debug_FTP)
+  {
+    client.print("SIZE ");
+    client.println(fileName);
+    Serial.println(F("Nouvelle taille du fichier :"));
+    if(!eRcv()) return false;
+  }
   client.println("QUIT");
 
   if(!eRcv()) return false;
