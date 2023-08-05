@@ -257,7 +257,7 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   int attemptNumber = 0;
   while(!client.available())
   {
-    if (attemptNumber++ > 50) return false;
+    if (attemptNumber++ > 50000) return false;
     delay(1);
   }
  
