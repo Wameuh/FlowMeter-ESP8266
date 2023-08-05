@@ -253,7 +253,14 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   byte byte_taille_fichier;
   char taille_fichier[64];
   int l_taille_fichier = 0;
-  while(!client.available()) delay(1);
+ 
+  int attemptNumber = 0;
+  while(!client.available())
+  {
+    if (attemptNumber++ > 50) return false;
+    delay(1);
+  }
+ 
   while(client.available())
   { 
     byte_taille_fichier = client.read();   
