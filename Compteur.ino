@@ -101,9 +101,16 @@ byte eRcv() //test connexion FTP (NE PAS MODIFIER)
 {
   byte respCode;
   byte thisByte;
-
-  while(!client.available()) delay(1);
-
+  int attemptNumber = 0;
+  while(!client.available())
+  {
+   delay(1);
+   if (attemptNumber++ > 50000)
+   {
+     efail();
+     return 0;
+   }
+  }
   respCode = client.peek();
 
   outCount = 0;
