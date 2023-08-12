@@ -17,8 +17,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Debug stuff
 bool  debug = false;
-bool debug_conditions = false;
-bool debug_FTP = false;
+bool debug_conditions = true;
+bool debug_FTP = true;
 
 //Récupération des informations de configuration (fichier configuration.h)
 const char *ssid = WIFI_SSID;  
@@ -36,7 +36,7 @@ unsigned long interval_affichage = 1000L; // Temps entre chaque raffraichissemen
 unsigned long interval_upload = 6000L; // Temps entre chaque upload sur le FTP (en cas de débit > 0) en ms
 unsigned long interval_sansdebit = 9000L; // Temps entre chaque upload sur le FTP (en cas de débit nul) en ms
 unsigned long interval_ntp = 3600000L; // Temps entre deux synchronosation avec le serveur NTP pour l'horodatage en ms (entre deux synchronisation il utilise millis())
-unsigned long interval_connexion = 600000L; // Temps avant d'essayer de se reconnecter en ms
+unsigned long interval_connexion = 60000L; // Temps avant d'essayer de se reconnecter en ms
 
 //Captor stuff
 // Basé sur capteur débit : F = 6*Q-8
@@ -84,14 +84,6 @@ void efail() //fermeture connexion FTP (NE PAS MODIFIER)
 
   client.println(F("QUIT"));
 
-  while(!client.available()) delay(1);
-
-  while(client.available())
-  { 
-    thisByte = client.read();   
-    Serial.write(thisByte);
-  }
-
   client.stop();
   Serial.println(F("Command disconnected - efail"));
 }
@@ -101,11 +93,11 @@ byte eRcv() //test connexion FTP (NE PAS MODIFIER)
 {
   byte respCode;
   byte thisByte;
-  int attemptNumber = 0;
+  uint64_t attemptNumber = 0;
   while(!client.available())
   {
    delay(1);
-   if (attemptNumber++ > 50000)
+   if (attemptNumber++ > 5000)
    {
      efail();
      return 0;
@@ -114,7 +106,7 @@ byte eRcv() //test connexion FTP (NE PAS MODIFIER)
   respCode = client.peek();
 
   outCount = 0;
-
+  attemptNumber = 0;
   while(client.available())
   { 
     thisByte = client.read();   
@@ -127,6 +119,11 @@ byte eRcv() //test connexion FTP (NE PAS MODIFIER)
       outBuf[outCount] = 0;
       if (debug) Serial.print(F("modification outBuf"));
       if (debug) Serial.println(outCount);
+    }
+    if (attemptNumber++ > 50000000) // Dans ce cas on est à minimum 50Mo
+    {
+      efail();
+      return 0;
     }
   }
 
@@ -212,6 +209,8 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
     if(tStr == NULL)
     {
       Serial.println(F("Bad PASV Answer"));
+      display.print(F("\nErreur FTP"));
+      display.display();
       return false;
     }
     if (debug) Serial.println(i+100);
@@ -261,15 +260,26 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   char taille_fichier[64];
   int l_taille_fichier = 0;
  
-  int attemptNumber = 0;
+  uint64_t attemptNumber = 0;
   while(!client.available())
   {
-    if (attemptNumber++ > 50000) return false;
+    if (attemptNumber++ > 5000)
+    {
+      display.print(F("\nErreur FTP"));
+      display.display();
+      return false;
+    }
     delay(1);
   }
- 
+  attemptNumber = 0;
   while(client.available())
   { 
+    if (attemptNumber++ > 50000000)
+    {
+      display.print(F("\nErreur FTP"));
+      display.display();
+      return false;
+    }
     byte_taille_fichier = client.read();   
     Serial.write(byte_taille_fichier);
     l_taille_fichier+=snprintf(taille_fichier + l_taille_fichier,64 - l_taille_fichier,"%c",byte_taille_fichier);
@@ -289,6 +299,8 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   client.println(fileName);
   if(!eRcv())
   {
+    display.print(F("\nErreur FTP"));
+    display.display();
     dclient.stop();
     return false;
   }
@@ -336,7 +348,8 @@ bool uploadFTP() //Fonction se connectant et uploadant sur le FTP
   {
     client.print("SIZE ");
     client.println(fileName);
-    Serial.println(F("Nouvelle taille du fichier :"));
+    Serial.print(F("Nouvelle taille du fichier :"));
+    Serial.println(fileName);
     if(!eRcv()) return false;
   }
   client.println("QUIT");
@@ -621,6 +634,10 @@ void loop()
         Millilitres_since_last_upload = 0;
         pulseCount_calibration = 0;
       }
+      else
+      {
+        efail();
+      }
     }
     if (extendedMillis() - previous_connexion > interval_connexion ) //toutes les 10 minutes on regarde si il y a toujours le WIFI sinon on se reconnecte
     {
@@ -636,6 +653,10 @@ void loop()
           Millilitres_since_last_upload = 0;
           pulseCount_calibration = 0;
         }
+        else
+        {
+          efail();
+        }
       }
       previous_connexion = extendedMillis();
     }
@@ -648,6 +669,10 @@ void loop()
         previous_upload = extendedMillis();
         Millilitres_since_last_upload = 0;
         pulseCount_calibration = 0;
+      }
+      else
+      {
+        efail();
       }
     }
     if (debug) Serial.println("fin d'une boucle");
